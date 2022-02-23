@@ -818,3 +818,106 @@ php -r "unlink('composer-setup.php');"
         + $ ENTER
 3. Reiniciar el servidor de apache:
     + $ sudo service apache2 restart
+
+
+
+
+
+
+
+
+## Deploy en DigitalOcean
+1. Ir a [DigitalOcean](https://cloud.digitalocean.com/login)
+2. Click en **Create > App**.
+3. Seleccionar el repositorio GitHub: **prueba-laravel-monogo-2022**.
+4. Seleccionar la rama **main** y clickear en **Autodeploy** y click en **Next**.
+5. Ajustar datos del formulario:
+    + Type: Web Services
+    + Environment Variables:
+        + APP_ENV=production
+        + APP_DEBUG=false
+        + APP_KEY=base64:WOUjUbU6cQ8foyIL/8ssOpFgLmG7WxfBi/xSXJ0O5kg=
+    + Build Command: 
+        + composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+        + php artisan optimize
+    + Run Command: heroku-php-apache2 public/
+    + HTTP Port: 8080
+6. Click en **Next**.
+7. Rellenar formulario:
+    + Name: prueba-laravel-monogo-2022
+    + Region: Seleccionar la más cercana (normalmente es la que viene por defecto)
+8. Click en **Next**.
+9. Seleccionar plan, RAM y CPU y click en **Launch Basic App**.
+
+
+10. Click en **Create > Database**.
+11. Seleccionar **Mongo DB**.
+12. Obtener credenciales:
+    ```
+    Public Network
+    username = doadmin
+    password = ***********
+    host = mongodb+srv://db-mongodb-nyc3-12324-99e35dae.mongo.ondigitalocean.com
+    port = 27017
+    database = admin
+
+    VPC Network
+    username = doadmin
+    password = ***********
+    host = mongodb+srv://private-db-mongodb-nyc3-12324-13ad9ea2.mongo.ondigitalocean.com
+    port = 27017
+    database = admin
+    ```
+
+
+13. Para agregar las credenciales de la base de datos como variables de entorno:
+    + Ir a la pestaña **Overview** y seleccionar la apliciación.
+    + Environment Variables:
+        + DB_CONNECTION=mongodb
+        + DB_HOST=mongodb+srv://db-mongodb-nyc3-12324-99e35dae.mongo.ondigitalocean.com
+        + DB_PORT=27017
+        + DB_DATABASE=admin
+        + DB_USERNAME=doadmin
+        + DB_PASSWORD=**********
+    + Click en **Save**. (Esperar a que se ejeucte el deploy)
+
+
+
+
+15. Ir a **Settings**, seleccionar el proyecto y agregar las siguientes intrucciones en **Commands > Build Command**:
+    + php artisan storage:link
+    + php artisan migrate --force
+    + npm install
+    + npm run prod
+16. Para el almacenamiento masivo se recomienda usar **Sapces Object Storage** de DigitalOcean o Amazon S3.
+17. Referencias:
+    + https://aprendible.com/series/aprende-laravel-intermedio/lecciones/como-publicar-una-aplicacion-de-laravel-en-digital-ocean-app-platform
+    + https://programacionymas.com/blog/hacer-deploy-app-laravel-digital-ocean
+
+
+
+
+
+18. Click en **Add a Database**.
+    + Choose Name: db
+    + Click en **Add Database**.
+
+
+DB_CONNECTION=mongodb
+DB_DSN=""
+DB_PORT=27017
+DB_DATABASE=admin
+DB_USERNAME=doadmin
+DB_PASSWORD=***
+
+
+DB_DSN="mongodb+srv://petrix:xiphos333@cluster0.7y5of.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+
+
+php artisan cache:clear
+php artisan config:clear
+php artisan config:cache
+
+mongodb+srv://doadmin:<replace-with-your-password>@db-mongodb-nyc3-12324-99e35dae.mongo.ondigitalocean.com/admin?authSource=admin&replicaSet=db-mongodb-nyc3-12324&tls=true&tlsCAFile=<replace-with-path-to-CA-cert>
+
+mongodb+srv://doadmin:<replace-with-your-password>@db-mongodb-nyc3-12324-99e35dae.mongo.ondigitalocean.com/admin?authSource=admin&replicaSet=db-mongodb-nyc3-12324&tls=true&tlsCAFile=ca-certificate.crt
